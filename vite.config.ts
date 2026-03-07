@@ -15,6 +15,14 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
+        '/api/auth': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
+        '/api/email': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+        },
         '/api/qwen': {
           target: 'https://dashscope-intl.aliyuncs.com',
           changeOrigin: true,

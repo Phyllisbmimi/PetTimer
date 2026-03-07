@@ -1,6 +1,24 @@
 import { create } from 'zustand';
 import { User, AuthState } from '../types';
 
+const isTauri =
+  typeof window !== 'undefined' &&
+  ('__TAURI__' in window || '__TAURI_INTERNALS__' in window);
+
+const AUTH_API_BASE = isTauri
+  ? import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:3001/api/auth'
+  : '/api/auth';
+
+const toUserFriendlyError = (error: unknown, fallback: string) => {
+  if (error instanceof TypeError) {
+    return 'Cannot connect to backend server. Please make sure backend is running on port 3001.';
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return fallback;
+};
+
 interface UserActivity {
   user: any;
   currentPet: any;
@@ -30,7 +48,7 @@ interface AuthStore extends AuthState {
   loadActivity: () => Promise<UserActivity | null>;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
   // 初始狀態
   user: null,
   isAuthenticated: false,
@@ -67,7 +85,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await fetch(
-        'http://localhost:3001/api/auth/register',
+        `${AUTH_API_BASE}/register`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -100,7 +118,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       localStorage.setItem('petTimer_auth_user', JSON.stringify(newUser));
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : 'Registration failed',
+        error: toUserFriendlyError(error, 'Registration failed'),
         isLoading: false,
       });
     }
@@ -111,7 +129,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await fetch(
-        'http://localhost:3001/api/auth/login',
+        `${AUTH_API_BASE}/login`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -138,7 +156,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set({ user, isAuthenticated: true, isGuest: false, isLoading: false });
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : 'Login failed',
+        error: toUserFriendlyError(error, 'Login failed'),
         isLoading: false,
       });
     }
@@ -178,7 +196,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
 
       const response = await fetch(
-        'http://localhost:3001/api/auth/activity',
+        `${AUTH_API_BASE}/activity`,
         {
           method: 'PUT',
           headers: {
@@ -210,7 +228,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
 
       const response = await fetch(
-        'http://localhost:3001/api/auth/activity',
+        `${AUTH_API_BASE}/activity`,
         {
           method: 'GET',
           headers: {
