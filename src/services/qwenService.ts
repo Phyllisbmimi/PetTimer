@@ -13,8 +13,8 @@ const DASHSCOPE_API_URL = isTauri || !isHttpEnvironment
   ? 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions'
   : '/api/qwen';
 
-// API Key - 在生產環境中需要嵌入
-const API_KEY = 'sk-b5a5ad064fa946ebbad64961ba14827a';
+// API Key - 請使用環境變數注入（不要硬編碼）
+const API_KEY = import.meta.env.VITE_DASHSCOPE_API_KEY || '';
 
 export interface QwenMessage {
   role: 'system' | 'user' | 'assistant';
@@ -201,7 +201,7 @@ const getHeaders = () => {
   };
   
   // 在 Tauri 環境中需要添加 Authorization header
-  if (isTauri) {
+  if (isTauri && API_KEY) {
     headers['Authorization'] = `Bearer ${API_KEY}`;
   }
   
