@@ -29,6 +29,7 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [textInput, setTextInput] = useState('');
   const [useTextMode, setUseTextMode] = useState(!speechService.isRecognitionSupported());
+  const imageBaseUrl = import.meta.env.BASE_URL;
 
   // 根據當前語言設置語音識別語言
   useEffect(() => {
@@ -42,10 +43,10 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
   }, [i18n.language]);
 
   const backgrounds = [
-    { id: 'home' as Background, icon: Home, label: t('animals.backgrounds.home'), gradient: 'from-orange-200 via-yellow-100 to-orange-200', image: '/backgrounds/home.png' },
-    { id: 'forest' as Background, icon: TreePine, label: t('animals.backgrounds.forest'), gradient: 'from-green-300 via-emerald-200 to-green-300', image: '/backgrounds/forest.png' },
-    { id: 'city' as Background, icon: Building2, label: t('animals.backgrounds.city'), gradient: 'from-blue-300 via-sky-200 to-blue-300', image: '/backgrounds/city.png' },
-    { id: 'castle' as Background, icon: Castle, label: t('animals.backgrounds.castle'), gradient: 'from-purple-300 via-pink-200 to-purple-300', image: '/backgrounds/castle.png' },
+    { id: 'home' as Background, icon: Home, label: t('animals.backgrounds.home'), gradient: 'from-orange-200 via-yellow-100 to-orange-200', image: `${imageBaseUrl}backgrounds/home.png` },
+    { id: 'forest' as Background, icon: TreePine, label: t('animals.backgrounds.forest'), gradient: 'from-green-300 via-emerald-200 to-green-300', image: `${imageBaseUrl}backgrounds/forest.png` },
+    { id: 'city' as Background, icon: Building2, label: t('animals.backgrounds.city'), gradient: 'from-blue-300 via-sky-200 to-blue-300', image: `${imageBaseUrl}backgrounds/city.png` },
+    { id: 'castle' as Background, icon: Castle, label: t('animals.backgrounds.castle'), gradient: 'from-purple-300 via-pink-200 to-purple-300', image: `${imageBaseUrl}backgrounds/castle.png` },
   ];
 
   const clothingItems = pet.items.filter(item => item.type === 'clothing');
