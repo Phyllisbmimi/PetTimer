@@ -1,0 +1,325 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'PingFang TC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animation classes */
+@keyframes bounce-pet {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+  }
+}
+
+.animate-pet-bounce {
+  animation: bounce-pet 0.6s infinite;
+}
+
+.animate-glow {
+  animation: glow 2s infinite;
+}
+
+.pet-card {
+  @apply rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer;
+}
+
+.btn-cartoon {
+  @apply px-6 py-3 rounded-full font-bold text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 active:scale-95;
+}
+
+.btn-primary {
+  @apply bg-primary btn-cartoon;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-dark btn-cartoon;
+}
+
+.card-blur {
+  @apply backdrop-blur-md bg-white/20 rounded-2xl p-6 border border-white/30;
+}
+
+/* Theme Patterns */
+.minecraft-pattern {
+  position: relative;
+  background-image: 
+    linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.minecraft-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.03) 10px, rgba(255,255,255,.03) 20px),
+    repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,0,0,.03) 10px, rgba(0,0,0,.03) 20px);
+  pointer-events: none;
+}
+
+.haikyuu-pattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.haikyuu-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 45%),
+    repeating-linear-gradient(0deg, transparent, transparent 26px, rgba(255, 255, 255, 0.05) 26px, rgba(255, 255, 255, 0.05) 30px),
+    repeating-linear-gradient(90deg, transparent, transparent 26px, rgba(0, 0, 0, 0.08) 26px, rgba(0, 0, 0, 0.08) 30px);
+  animation: haikyuu-court 18s linear infinite;
+  pointer-events: none;
+}
+
+.haikyuu-pattern::after {
+  content: '🏐';
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.15;
+  animation: volleyball-bounce 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes haikyuu-court {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 120px 120px, 0 120px, 120px 0;
+  }
+}
+
+@keyframes volleyball-bounce {
+  0%, 100% {
+    top: 15%;
+    left: 12%;
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    top: 75%;
+    left: 78%;
+    transform: translateY(-12px) rotate(180deg);
+  }
+}
+
+.naruto-pattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.naruto-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(255, 255, 255, 0.05) 50px, rgba(255, 255, 255, 0.05) 100px),
+    repeating-linear-gradient(-45deg, transparent, transparent 50px, rgba(0, 0, 0, 0.05) 50px, rgba(0, 0, 0, 0.05) 100px);
+  animation: naruto-scroll 30s linear infinite;
+  pointer-events: none;
+}
+
+.naruto-pattern::after {
+  content: '🍃';
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.1;
+  animation: leaf-fall 15s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes naruto-scroll {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 100px 100px, -100px -100px;
+  }
+}
+
+@keyframes leaf-fall {
+  0% {
+    top: -10%;
+    left: 10%;
+    transform: rotate(0deg);
+  }
+  100% {
+    top: 110%;
+    left: 90%;
+    transform: rotate(720deg);
+  }
+}
+
+.fairy-tail-pattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.fairy-tail-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 30%, rgba(255, 230, 150, 0.16) 0 3px, transparent 4px),
+    radial-gradient(circle at 50% 75%, rgba(255, 180, 180, 0.14) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 65%, rgba(150, 220, 255, 0.14) 0 2px, transparent 3px);
+  background-size: 180px 180px, 220px 220px, 160px 160px, 200px 200px;
+  animation: fairy-tail-spark 14s linear infinite;
+  pointer-events: none;
+}
+
+.fairy-tail-pattern::after {
+  content: '✨';
+  position: absolute;
+  font-size: 1.7rem;
+  opacity: 0.2;
+  animation: fairy-tail-glide 12s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes fairy-tail-spark {
+  0% {
+    background-position: 0 0, 40px 20px, 80px 100px, 20px 60px;
+  }
+  100% {
+    background-position: 180px 180px, 260px 240px, 240px 280px, 220px 260px;
+  }
+}
+
+@keyframes fairy-tail-glide {
+  0%, 100% {
+    top: 12%;
+    left: 18%;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    top: 78%;
+    left: 82%;
+    transform: scale(1.15) rotate(35deg);
+  }
+}
+
+.theme-minimalLight .text-white,
+.theme-minimalLight .text-white\/90,
+.theme-minimalLight .text-white\/80,
+.theme-minimalLight .text-white\/70,
+.theme-minimalLight .text-white\/60,
+.theme-minimalLight .text-white\/50,
+.theme-minimalLight .text-white\/40 {
+  color: #111111 !important;
+}
+
+.theme-minimalLight .text-accent {
+  color: #dc2626 !important;
+}
+
+.theme-minimalLight .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+.theme-minimalLight .bg-white\/10 {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+.theme-minimalLight .bg-white\/20 {
+  background-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+.theme-minimalLight .bg-white\/80,
+.theme-minimalLight .bg-white\/90 {
+  background-color: #f3f4f6 !important;
+}
+
+.theme-minimalLight .border-white,
+.theme-minimalLight .border-white\/20,
+.theme-minimalLight .border-white\/30,
+.theme-minimalLight .border-white\/40 {
+  border-color: rgba(15, 23, 42, 0.14) !important;
+}
+
+.theme-minimalLight .hover\:bg-white\/10:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+.theme-minimalLight .hover\:bg-white\/20:hover {
+  background-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+.theme-minimalLight .hover\:text-white:hover,
+.theme-minimalLight .hover\:text-white\/80:hover {
+  color: #111111 !important;
+}
+
+.theme-minimalLight .placeholder-gray-400::placeholder,
+.theme-minimalLight .placeholder-gray-500::placeholder {
+  color: #6b7280 !important;
+}
+
+.theme-minimalLight .card-blur {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08) !important;
+}
+
+.theme-minimalDark .text-white,
+.theme-minimalDark .text-white\/90,
+.theme-minimalDark .text-white\/80,
+.theme-minimalDark .text-white\/70,
+.theme-minimalDark .text-white\/60,
+.theme-minimalDark .text-white\/50,
+.theme-minimalDark .text-white\/40 {
+  color: #ffff  !important;
+}
+
+.theme-minimalDark .text-accent {
+  color: #ef4444 !important;
+}
+
+.theme-minimalDark .hover\:text-white:hover,
+.theme-minimalDark .hover\:text-white\/80:hover {
+  color: #ef4444 !important;
+}
