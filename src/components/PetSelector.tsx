@@ -11,6 +11,22 @@ export const PetSelector: React.FC<PetSelectorProps> = ({ onSelectPet, existingP
   const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState<PetType>('cat');
   const [petName, setPetName] = useState('');
+  const [imageFallbacks, setImageFallbacks] = useState<Record<string, boolean>>({});
+  const imageBaseUrl = import.meta.env.BASE_URL;
+
+  const getPetImagePath = (type: PetType, fallback = false) => {
+    const ext = fallback ? 'jpg' : 'png';
+    return `${imageBaseUrl}backgrounds/${type}.${ext}`;
+  };
+
+  const getImageSrc = (type: PetType) => getPetImagePath(type, !!imageFallbacks[type]);
+
+  const handleImageError = (type: PetType) => {
+    setImageFallbacks((state) => {
+      if (state[type]) return state;
+      return { ...state, [type]: true };
+    });
+  };
 
   const petOptions: Array<{ type: PetType; emoji: string; labelKey: string; descKey: string }> =
     [
@@ -81,7 +97,12 @@ export const PetSelector: React.FC<PetSelectorProps> = ({ onSelectPet, existingP
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              <div className="text-5xl mb-2">{pet.emoji}</div>
+              <img
+                src={getImageSrc(pet.type)}
+                alt={t(pet.labelKey)}
+                className="w-20 h-20 object-cover rounded-xl mx-auto mb-2 border-2 border-white/40"
+                onError={() => handleImageError(pet.type)}
+              />
               <h3 className="font-bold text-lg mb-1">{t(pet.labelKey)}</h3>
               <p className="text-xs opacity-80">{t(pet.descKey)}</p>
             </button>
@@ -90,7 +111,12 @@ export const PetSelector: React.FC<PetSelectorProps> = ({ onSelectPet, existingP
 
         {/* 大預覽 */}
         <div className="bg-white/10 rounded-2xl p-8 mb-8 border border-white/20 text-center">
-          <div className="text-8xl mb-4">{selectedPet?.emoji}</div>
+          <img
+            src={selectedPet ? getImageSrc(selectedPet.type) : ''}
+            alt={selectedPet ? t(selectedPet.labelKey) : 'Pet'}
+            className="w-44 h-44 object-cover rounded-2xl mx-auto mb-4 border-4 border-white/40"
+            onError={() => selectedPet && handleImageError(selectedPet.type)}
+          />
           <p className="text-white/80 text-lg">
             {selectedPet && t(selectedPet.labelKey)}
           </p>

@@ -63,22 +63,33 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
     }
   };
 
+  const getPetImageSrc = () => {
+    const imageBaseUrl = import.meta.env.DEV ? '/' : '/PetTimer/';
+    return `${imageBaseUrl}backgrounds/${pet.type}.png`;
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // 如果圖片加載失敗,使用表情符號作為後備
+    e.currentTarget.style.display = 'none';
+    const fallbackEmoji = pet.type === 'dog' ? '🐶' : pet.type === 'cat' ? '🐱' : '🦊';
+    const emojiSpan = document.createElement('span');
+    emojiSpan.className = stage === 'child' ? 'text-6xl' : stage === 'teen' ? 'text-7xl' : 'text-8xl';
+    emojiSpan.textContent = fallbackEmoji;
+    e.currentTarget.parentElement?.appendChild(emojiSpan);
+  };
+
   const getPetVisual = (type: string, stage: string) => {
-    // 根據類型和階段返回不同外觀
-    if (type === 'dog') {
-      if (stage === 'child') return { face: '🐶', accessory: '', body: '🟤', paw: '🐾', emoji: '👶' };
-      if (stage === 'teen') return { face: '🐶', accessory: '🎓', body: '🟤', paw: '🐾', emoji: '🧒' };
-      return { face: '🐶', accessory: '👑', body: '🟤', paw: '🐾', emoji: '🦸' };
+    // 根據階段返回不同配飾
+    if (stage === 'child') return { accessory: '', emoji: '👶' };
+    if (stage === 'teen') {
+      if (type === 'dog') return { accessory: '🎓', emoji: '🧒' };
+      if (type === 'cat') return { accessory: '🎀', emoji: '🧒' };
+      return { accessory: '🧣', emoji: '🧒' };
     }
-    if (type === 'cat') {
-      if (stage === 'child') return { face: '🐱', accessory: '', body: '🟡', paw: '🐾', emoji: '👶' };
-      if (stage === 'teen') return { face: '🐱', accessory: '🎀', body: '🟡', paw: '🐾', emoji: '🧒' };
-      return { face: '🐱', accessory: '💎', body: '🟡', paw: '🐾', emoji: '✨' };
-    }
-    // fox
-    if (stage === 'child') return { face: '🦊', accessory: '', body: '🟠', paw: '🐾', emoji: '👶' };
-    if (stage === 'teen') return { face: '🦊', accessory: '🧣', body: '🟠', paw: '🐾', emoji: '🧒' };
-    return { face: '🦊', accessory: '🎩', body: '🟠', paw: '🐾', emoji: '🌟' };
+    // adult
+    if (type === 'dog') return { accessory: '👑', emoji: '🦸' };
+    if (type === 'cat') return { accessory: '💎', emoji: '✨' };
+    return { accessory: '🎩', emoji: '🌟' };
   };
 
   const handlePet = () => {
@@ -128,9 +139,13 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
             
             {/* 主臉部 + 配飾 */}
             <div className="relative">
-              <div className={`${stage === 'child' ? 'text-6xl' : stage === 'teen' ? 'text-7xl' : 'text-8xl'}`}>
-                {visual.face}
-              </div>
+              <img
+                src={getPetImageSrc()}
+                alt={pet.name}
+                className={`${stage === 'child' ? 'w-24 h-24' : stage === 'teen' ? 'w-28 h-28' : 'w-32 h-32'} object-contain drop-shadow-2xl`}
+                draggable={false}
+                onError={handleImageError}
+              />
               {visual.accessory && (
                 <div className="absolute -top-2 -right-2 text-3xl animate-pulse">
                   {visual.accessory}
@@ -138,19 +153,10 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
               )}
             </div>
 
-            {/* 身體 */}
-            <div
-              className={`rounded-full ${stage === 'child' ? 'w-16 h-14' : stage === 'teen' ? 'w-20 h-16' : 'w-24 h-20'} flex items-center justify-center shadow-md border-2 border-white/70`}
-              style={{
-                background:
-                  pet.type === 'dog'
-                    ? 'linear-gradient(135deg, #d6b07a, #b98956)'
-                    : pet.type === 'cat'
-                      ? 'linear-gradient(135deg, #f2d37d, #f0ba61)'
-                      : 'linear-gradient(135deg, #ffae73, #ff8a4c)',
-              }}
-            >
-              <span className="text-lg">{visual.paw}</span>
+            {/* 可愛的腳印裝飾 */}
+            <div className="flex gap-2 text-2xl opacity-70 mt-2">
+              <span>🐾</span>
+              <span>🐾</span>
             </div>
           </div>
         </div>
@@ -164,20 +170,32 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
       </div>
 
       <div className="mt-6 space-y-2">
-        <h2 className="text-3xl font-bold text-dark">{pet.name}</h2>
-        <p className="text-sm text-gray-600">
-          {t('pet.level', { level: pet.level })} | {t('pet.experience', { exp: pet.experience })}
-        </p>
-        <p className="text-xs font-semibold text-purple-600">
+        <h2 className="text-3xl font-bold text-dark drop-shadow-sm">{pet.name}</h2>
+        <p className="text-xs font-bold bg-purple-500/90 text-white rounded-full px-3 py-1 inline-block shadow-md">
           {t('pet.stage')}: {t(`pet.stages.${stage}`)}
         </p>
 
+        {/* 等級 */}
         <div className="mt-2">
-          <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-            <span>{t('pet.nextLevel')}</span>
-            <span>{currentLevelExp}/100 EXP</span>
+          <div className="flex items-center justify-between mb-1 bg-white/60 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
+            <div className="flex items-center gap-1 text-sm font-bold text-purple-700">
+              <span>⭐</span>
+              {t('pet.level', { level: pet.level })}
+            </div>
+            <span className="text-xs font-bold text-purple-900">{pet.level}</span>
           </div>
-          <div className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+        </div>
+
+        {/* 經驗值 */}
+        <div>
+          <div className="flex items-center justify-between mb-1 bg-white/60 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
+            <div className="flex items-center gap-1 text-sm font-bold text-blue-700">
+              <span>✨</span>
+              {t('pet.experience', { exp: currentLevelExp })}
+            </div>
+            <span className="text-xs font-bold text-blue-900">{currentLevelExp}/100</span>
+          </div>
+          <div className="w-full bg-gray-300 rounded-full h-2 overflow-hidden shadow-inner">
             <div className="bg-purple-500 h-full transition-all" style={{ width: `${currentLevelExp}%` }} />
           </div>
         </div>
@@ -186,14 +204,14 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
         <div className="space-y-3 mt-6">
           {/* 飢餓 */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1 text-sm font-semibold">
+            <div className="flex items-center justify-between mb-1 bg-white/60 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
+              <div className="flex items-center gap-1 text-sm font-bold text-orange-700">
                 <Leaf className="w-4 h-4" />
                 {t('pet.hunger')}
               </div>
-              <span className="text-xs font-bold">{pet.hunger}%</span>
+              <span className="text-xs font-bold text-orange-900">{pet.hunger}%</span>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden shadow-inner">
               <div
                 className="bg-orange-400 h-full transition-all"
                 style={{ width: `${pet.hunger}%` }}
@@ -203,14 +221,14 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
 
           {/* 幸福 */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1 text-sm font-semibold">
+            <div className="flex items-center justify-between mb-1 bg-white/60 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
+              <div className="flex items-center gap-1 text-sm font-bold text-pink-700">
                 <Heart className="w-4 h-4" />
                 {t('pet.happiness')}
               </div>
-              <span className="text-xs font-bold">{pet.happiness}%</span>
+              <span className="text-xs font-bold text-pink-900">{pet.happiness}%</span>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden shadow-inner">
               <div
                 className="bg-pink-400 h-full transition-all"
                 style={{ width: `${pet.happiness}%` }}
@@ -220,14 +238,14 @@ export const PetCard: React.FC<PetCardProps> = ({ pet, onFeed, onPet }) => {
 
           {/* 能量 */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-1 text-sm font-semibold">
+            <div className="flex items-center justify-between mb-1 bg-white/60 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
+              <div className="flex items-center gap-1 text-sm font-bold text-yellow-700">
                 <Zap className="w-4 h-4" />
                 {t('pet.energy')}
               </div>
-              <span className="text-xs font-bold">{pet.energy}%</span>
+              <span className="text-xs font-bold text-yellow-900">{pet.energy}%</span>
             </div>
-            <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-gray-300 rounded-full h-3 overflow-hidden shadow-inner">
               <div
                 className="bg-yellow-400 h-full transition-all"
                 style={{ width: `${pet.energy}%` }}

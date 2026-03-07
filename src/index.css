@@ -305,6 +305,15 @@ body {
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08) !important;
 }
 
+/* Base text color for minimalLight theme */
+.theme-minimalLight {
+  color: #111111 !important;
+}
+
+.theme-minimalLight body {
+  color: #111111 !important;
+}
+
 .theme-minimalDark .text-white,
 .theme-minimalDark .text-white\/90,
 .theme-minimalDark .text-white\/80,

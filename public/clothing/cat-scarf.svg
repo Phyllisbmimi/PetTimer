@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 75">
+  <!-- Scarf loop around neck -->
+  <ellipse cx="48" cy="25" rx="33" ry="12" fill="#FF6347" opacity="0.9"/>
+  <!-- Left end -->
+  <path d="M 22 32 L 16 62 Q 14 69, 18 73 L 27 71 Q 29 67, 27 62 L 31 36 Z" fill="#FF6347" opacity="0.9"/>
+  <!-- Right end -->
+  <path d="M 74 32 L 80 62 Q 82 69, 78 73 L 69 71 Q 67 67, 69 62 L 65 36 Z" fill="#FF6347" opacity="0.9"/>
+  <!-- Stripes -->
+  <ellipse cx="48" cy="22" rx="30" ry="2.5" fill="#ffffff" opacity="0.6"/>
+  <rect x="18" y="44" width="7" height="3.5" fill="#ffffff" opacity="0.6"/>
+  <rect x="71" y="44" width="7" height="3.5" fill="#ffffff" opacity="0.6"/>
+  <!-- Fringes -->
+  <rect x="15" y="71" width="2.5" height="3.5" fill="#FF6347" opacity="0.8"/>
+  <rect x="20" y="70" width="2.5" height="4" fill="#FF6347" opacity="0.8"/>
+  <rect x="69" y="70" width="2.5" height="4" fill="#FF6347" opacity="0.8"/>
+  <rect x="75" y="71" width="2.5" height="3.5" fill="#FF6347" opacity="0.8"/>
+</svg>

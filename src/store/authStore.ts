@@ -191,10 +191,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const token = localStorage.getItem('petTimer_auth_token');
       if (!token) {
-        console.warn('No auth token available');
+        console.warn('⚠️ No auth token available for saving activity');
         return;
       }
 
+      console.log('📤 Sending activity to backend:', `${AUTH_API_BASE}/activity`);
       const response = await fetch(
         `${AUTH_API_BASE}/activity`,
         {
@@ -209,12 +210,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       const data = await response.json();
       if (!data.success) {
-        console.error('Failed to save activity:', data.error);
+        console.error('❌ Failed to save activity:', data.error);
       } else {
-        console.log('✅ Activity data saved to backend');
+        console.log('✅ Activity data saved to backend successfully');
       }
     } catch (error) {
-      console.error('Error saving activity:', error);
+      console.error('❌ Error saving activity:', error);
     }
   },
 
@@ -223,10 +224,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const token = localStorage.getItem('petTimer_auth_token');
       if (!token) {
-        console.warn('No auth token available');
+        console.warn('⚠️ No auth token available for loading activity');
         return null;
       }
 
+      console.log('📥 Fetching activity from backend:', `${AUTH_API_BASE}/activity`);
       const response = await fetch(
         `${AUTH_API_BASE}/activity`,
         {
@@ -239,12 +241,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       const data = await response.json();
       if (data.success && data.activity) {
-        console.log('✅ Activity data loaded from backend');
+        console.log('✅ Activity data received from backend');
         return data.activity;
+      } else {
+        console.log('⚠️ No activity data in response:', data);
       }
       return null;
     } catch (error) {
-      console.error('Error loading activity:', error);
+      console.error('❌ Error loading activity:', error);
       return null;
     }
   },

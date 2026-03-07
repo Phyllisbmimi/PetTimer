@@ -33,7 +33,6 @@ export const Shop: React.FC<ShopProps> = ({ coins, fire, onBuy }) => {
     { id: '17', type: 'clothing', name: 'sunglasses', nameKey: 'sunglasses', rarity: 'rare', cost: 48, emoji: '🕶️' },
     { id: '18', type: 'clothing', name: 'scarf', nameKey: 'scarf', rarity: 'common', cost: 25, emoji: '🧣' },
     { id: '19', type: 'clothing', name: 'superhero', nameKey: 'superhero', rarity: 'epic', cost: 220, emoji: '🦸' },
-    { id: '20', type: 'clothing', name: 'backpack', nameKey: 'backpack', rarity: 'rare', cost: 70, emoji: '🎒' },
   ];
 
   const toyItems: Array<PetItem & { cost: number; emoji: string; nameKey: string }> = [

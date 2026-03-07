@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from './store/appStore';
 import { useAuthStore } from './store/authStore';
@@ -33,6 +33,10 @@ function App() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [hasPet, setHasPet] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [showLeaveFocusConfirm, setShowLeaveFocusConfirm] = useState(false);
+  const [pendingPage, setPendingPage] = useState<PageType | null>(null);
+  const hasAppliedMimiBonus = useRef(false);
   
   // Zustand stores
   const {
@@ -70,6 +74,14 @@ function App() {
   } = useAuthStore();
 
   const streak = useCheckInStreak(checkIns);
+  const orderedPages: PageType[] = ['home', 'goals', 'checkin', 'shop', 'animals', 'ai', 'profile'];
+
+  const isBackpackItem = (name: string) => name === 'backpack' || name === '校園背包';
+
+  const removeBackpackItems = <T extends { items: PetItem[] }>(pet: T): T => ({
+    ...pet,
+    items: pet.items.filter((item) => !isBackpackItem(item.name)),
+  });
 
   // 初始化認證狀態
   useEffect(() => {
@@ -108,6 +120,37 @@ function App() {
     }
   }, [isAuthenticated, isGuest, authUser, setUser, setCurrentPet, loadActivityFromBackend]);
 
+  useEffect(() => {
+    if (!isAuthenticated || !authUser || hasAppliedMimiBonus.current) return;
+    if (authUser.username.trim().toLowerCase() !== 'mimi') return;
+
+    if (coins < 2000) {
+      addCoins(2000 - coins);
+    }
+    hasAppliedMimiBonus.current = true;
+  }, [isAuthenticated, authUser, coins, addCoins]);
+
+  useEffect(() => {
+    const currentPetHasBackpack = currentPet?.items.some((item) => isBackpackItem(item.name));
+    const userHasBackpack = user?.pets.some((pet) => pet.items.some((item) => isBackpackItem(item.name)));
+
+    if (!currentPetHasBackpack && !userHasBackpack) return;
+
+    if (currentPetHasBackpack && currentPet) {
+      setCurrentPet(removeBackpackItems(currentPet));
+    }
+
+    if (user) {
+      const cleanedPets = user.pets.map((pet) => removeBackpackItems(pet));
+      const cleanedCurrentPet = user.currentPet ? removeBackpackItems(user.currentPet) : user.currentPet;
+      setUser({
+        ...user,
+        pets: cleanedPets,
+        currentPet: cleanedCurrentPet,
+      });
+    }
+  }, [user, currentPet, setUser, setCurrentPet]);
+
   // 保存用戶數據
   useEffect(() => {
     if (user && isGuest) {
@@ -124,6 +167,31 @@ function App() {
       return () => clearTimeout(saveTimer);
     }
   }, [user, currentPet, goals, sessions, checkIns, coins, fire, isAuthenticated, isGuest, authUser, saveActivityToBackend]);
+
+  // 🔒 頁面關閉前保存數據（防止數據丟失）
+  useEffect(() => {
+    if (!isAuthenticated || !authUser) return;
+
+    const handleBeforeUnload = () => {
+      // 立即保存數據（同步方式）
+      saveActivityToBackend();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // 標籤頁隱藏時保存數據
+        saveActivityToBackend();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, authUser, saveActivityToBackend]);
 
   const handleSelectPet = (pet: Pet) => {
     const newUser: UserData = {
@@ -174,14 +242,66 @@ function App() {
   const handleBuyItem = (item: PetItem, cost: number) => {
     if (coins >= cost) {
       useCoins(cost);
-      alert(t('shop.purchaseSuccess', { item: item.name }));
+
+      if (currentPet && !currentPet.items.some((existingItem) => existingItem.id === item.id)) {
+        setCurrentPet({
+          ...currentPet,
+          items: [...currentPet.items, item],
+        });
+      }
+
+      const localizedItemName = t(`shop.items.${item.name}`, { defaultValue: item.name });
+      alert(t('shop.purchaseSuccess', { item: localizedItemName }));
     }
+  };
+
+  const handleNavigate = (page: PageType) => {
+    if (isTimerRunning && page !== currentPage) {
+      setPendingPage(page);
+      setShowLeaveFocusConfirm(true);
+      return;
+    }
+    setCurrentPage(page);
+  };
+
+  const handleStayInFocus = () => {
+    setPendingPage(null);
+    setShowLeaveFocusConfirm(false);
+  };
+
+  const handleConfirmLeaveFocus = () => {
+    const targetPage = pendingPage;
+    setShowLeaveFocusConfirm(false);
+    setPendingPage(null);
+    setIsTimerRunning(false);
+    if (targetPage) {
+      setCurrentPage(targetPage);
+    }
+  };
+
+  const handleStepPage = (direction: 'previous' | 'next') => {
+    const currentIndex = orderedPages.indexOf(currentPage);
+    const nextIndex =
+      direction === 'next'
+        ? (currentIndex + 1) % orderedPages.length
+        : (currentIndex - 1 + orderedPages.length) % orderedPages.length;
+
+    handleNavigate(orderedPages[nextIndex]);
   };
 
   const handleFeedPet = () => {
     if (currentPet) {
       feedPet(currentPet.id);
     }
+  };
+
+  const handleConsumePetItem = (itemId: string) => {
+    if (!currentPet) return;
+
+    setCurrentPet({
+      ...currentPet,
+      items: currentPet.items.filter((item) => item.id !== itemId),
+    });
   };
 
   const handlePetPet = () => {
@@ -262,9 +382,10 @@ function App() {
       {/* 導航欄 */}
       <NavBar
         currentPage={currentPage}
-        onNavigate={(page) => setCurrentPage(page)}
+        onNavigate={handleNavigate}
         coins={coins}
         fire={fire}
+        navigationLocked={isTimerRunning}
       />
 
       {/* 主容器 */}
@@ -281,6 +402,7 @@ function App() {
             <div className="lg:col-span-2">
               <PomodoroTimer
                 duration={25}
+                onRunningChange={setIsTimerRunning}
                 onComplete={() => {
                   addFire(1);
                   addCoins(5);
@@ -326,7 +448,12 @@ function App() {
 
         {/* 動物頁面 */}
         {currentPage === 'animals' && currentPet && (
-          <AnimalsPage pet={currentPet} onFeed={handleFeedPet} onPet={handlePetPet} />
+          <AnimalsPage
+            pet={currentPet}
+            onFeed={handleFeedPet}
+            onPet={handlePetPet}
+            onConsumeItem={handleConsumePetItem}
+          />
         )}
 
         {/* AI 助手頁面 */}
@@ -400,10 +527,60 @@ function App() {
             </div>
           </div>
         )}
+
+        <div className="mt-6 flex items-center justify-between">
+          <button
+            onClick={() => handleStepPage('previous')}
+            disabled={isTimerRunning}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              isTimerRunning
+                ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            Previous Page
+          </button>
+          <button
+            onClick={() => handleStepPage('next')}
+            disabled={isTimerRunning}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+              isTimerRunning
+                ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            Next Page
+          </button>
+        </div>
       </div>
       
       {/* 自動更新組件 - 僅在 Tauri 環境中顯示 */}
       <AutoUpdater />
+
+      {showLeaveFocusConfirm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+            <h3 className="text-xl font-bold text-dark">⚠️ Timer is running</h3>
+            <p className="text-gray-700 text-sm">
+              You are about to leave the focus page. Do you really want to leave?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleStayInFocus}
+                className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+              >
+                Continue Focus
+              </button>
+              <button
+                onClick={handleConfirmLeaveFocus}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+              >
+                Really want to leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 80">
+  <!-- Crown base -->
+  <ellipse cx="57.5" cy="62" rx="44" ry="10" fill="#FFD700" opacity="0.95"/>
+  <!-- Crown body -->
+  <path d="M 18 62 L 22 36 L 31 44 L 40 22 L 48 44 L 57.5 18 L 67 44 L 75 22 L 84 44 L 93 36 L 97 62 Z" fill="#FFD700" opacity="0.95"/>
+  <!-- Jewels -->
+  <circle cx="31" cy="44" r="3.5" fill="#FF0000" opacity="0.9"/>
+  <circle cx="57.5" cy="30" r="4.5" fill="#FF0000" opacity="0.9"/>
+  <circle cx="84" cy="44" r="3.5" fill="#FF0000" opacity="0.9"/>
+  <!-- Highlight -->
+  <path d="M 25 62 L 28 40 L 33 46 L 29 42 L 27 60" fill="#ffffff" opacity="0.3"/>
+  <ellipse cx="57.5" cy="60" rx="35" ry="7" fill="#ffffff" opacity="0.2"/>
+</svg>

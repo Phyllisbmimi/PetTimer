@@ -14,8 +14,9 @@ cd ~/HKBU\ Hack/PetTimer
 ```bash
 # 編輯 .env 文件，填入你的 DashScope API key
 vim .env
-# 或在 VS Code 中打開 .env，找到 DASHSCOPE_API_KEY=，填入你的 key
+# 或在 VS Code 中打開 .env，填入 DASHSCOPE_API_KEY= 或 VITE_DASHSCOPE_API_KEY=
 # 例如: DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx
+# 或: VITE_DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx
 ```
 
 2. **啟動 Web 開發版（推薦快速測試）**
@@ -100,11 +101,12 @@ npm run tauri:dev
 
 **原因 1：Key 為空**
 ```bash
-# 檢查 .env 是否有 DASHSCOPE_API_KEY 值
-cat .env | grep DASHSCOPE_API_KEY
+# 檢查 .env 是否有 DASHSCOPE_API_KEY 或 VITE_DASHSCOPE_API_KEY 值
+cat .env | grep -E "DASHSCOPE_API_KEY|VITE_DASHSCOPE_API_KEY"
 
-# 應該看到：DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx
-# 不應該看到：DASHSCOPE_API_KEY=（空值）
+# 應該看到其中一個：
+# DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx
+# 或 VITE_DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx
 ```
 
 **原因 2：Key 無效**

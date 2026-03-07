@@ -1,4 +1,5 @@
 {
+  "lang": "zh-CN",
   "common": {
     "appName": "宠物计时器",
     "appDescription": "宠物养成 + 番茄钟时间管理",
@@ -35,8 +36,8 @@
     "pomodoroComplete": "🎉 完成一个番茄钟！获得 1 火焰和 5 硬币"
   },
   "pet": {
-    "level": "等级 {level}",
-    "experience": "经验 {exp}",
+    "level": "等级 {{level}}",
+    "experience": "经验 {{exp}}",
     "stage": "阶段",
     "nextLevel": "下个等级",
     "hunger": "饥饿度",
@@ -144,7 +145,7 @@
     },    "buy": "购买",
     "insufficientCoins": "硬币不足",
     "tip": "完成更多番茄钟来赚取硬币和火焰！",
-    "purchaseSuccess": "成功购买 {item}！"
+    "purchaseSuccess": "成功购买 {{item}}！"
   },
   "profile": {
     "title": "个人资料",
@@ -184,6 +185,7 @@
     "voiceError": "语音对话出错了",
     "typeMessage": "输入消息...",
     "send": "发送",
+    "yummy": "好吃！",
     "autoCloseIn5sec": "5秒后自动关闭，或点击 X 立即关闭"
   },
   "petSelector": {
@@ -267,13 +269,14 @@
     "minimalDark": "极简深色",
     "minimalDarkDesc": "纯黑背景，白色文字",
     "minimalLight": "极简浅色",
-    "minimalLightDesc": "纯白背景，白色文字"
+    "minimalLightDesc": "纯白背景，黑色文字"
   },
   "ai": {
     "title": "AI 助手",
     "subtitle": "你的智能生产力小帮手，由 Qwen AI 驱动",
     "welcome": "👋 你好！我是你的 AI 助手。有什么可以帮到你？",
     "askAnything": "你可以问我任何关于生产力、目标设定或时间管理的问题！",
+    "askQuestion": "问 AI 助手",
     "suggestions": "推荐问题：",
     "thinking": "思考中...",
     "inputPlaceholder": "在这里输入你的问题...",

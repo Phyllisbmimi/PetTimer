@@ -243,8 +243,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // 從後端加載活動數據
   loadActivityFromBackend: async () => {
     try {
+      console.log('🔄 Loading activity from backend...');
       const activity = await useAuthStore.getState().loadActivity();
       if (activity) {
+        console.log('📦 Activity data received:', {
+          hasUser: !!activity.user,
+          hasPet: !!activity.currentPet,
+          petType: activity.currentPet?.type,
+          coins: activity.coins,
+          itemsCount: activity.currentPet?.items?.length || 0,
+        });
         set({
           user: activity.user,
           currentPet: activity.currentPet,
@@ -256,10 +264,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
           soundEnabled: activity.soundEnabled !== undefined ? activity.soundEnabled : true,
           theme: (activity.theme as AppTheme) || 'minecraft',
         });
-        console.log('✅ Activity data loaded from backend');
+        console.log('✅ Activity data loaded from backend successfully');
+      } else {
+        console.log('⚠️ No activity data found on backend');
       }
     } catch (error) {
-      console.error('Error loading activity from backend:', error);
+      console.error('❌ Error loading activity from backend:', error);
     }
   },
   
@@ -278,9 +288,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
         soundEnabled: state.soundEnabled,
         theme: state.theme,
       };
+      console.log('💾 Saving activity to backend:', {
+        hasUser: !!activity.user,
+        hasPet: !!activity.currentPet,
+        petType: activity.currentPet?.type,
+        coins: activity.coins,
+        itemsCount: activity.currentPet?.items?.length || 0,
+      });
       await useAuthStore.getState().saveActivity(activity);
+      console.log('✅ Activity save completed');
     } catch (error) {
-      console.error('Error saving activity to backend:', error);
+      console.error('❌ Error saving activity to backend:', error);
     }
   },
 }));

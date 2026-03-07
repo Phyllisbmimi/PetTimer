@@ -1,4 +1,5 @@
 {
+  "lang": "zh-HK",
   "common": {
     "appName": "寵物計時器",
     "appDescription": "寵物養成 + 番茄鐘時間管理",
@@ -35,8 +36,8 @@
     "pomodoroComplete": "🎉 完成一個番茄鐘！獲得 1 火焰和 5 硬幣"
   },
   "pet": {
-    "level": "等級 {level}",
-    "experience": "經驗 {exp}",
+    "level": "等級 {{level}}",
+    "experience": "經驗 {{exp}}",
     "stage": "階段",
     "nextLevel": "下個等級",
     "hunger": "飢餓度",
@@ -144,7 +145,7 @@
     },    "buy": "購買",
     "insufficientCoins": "硬幣不足",
     "tip": "完成更多番茄鐘來賺取硬幣和火焰！",
-    "purchaseSuccess": "成功購買 {item}！"
+    "purchaseSuccess": "成功購買 {{item}}！"
   },
   "profile": {
     "title": "個人資料",
@@ -184,6 +185,7 @@
     "voiceError": "語音對話出錯咗",
     "typeMessage": "輸入訊息...",
     "send": "發送",
+    "yummy": "好味呀！",
     "autoCloseIn5sec": "5秒後自動關閉，或點擊 X 立即關閉"
   },
   "petSelector": {
@@ -267,14 +269,13 @@
     "minimalDark": "極簡深色",
     "minimalDarkDesc": "純黑背景，白色文字",
     "minimalLight": "極簡淺色",
-    "minimalLightDesc": "純白背景，白色文字"
+    "minimalLightDesc": "純白背景，黑色文字"
   },
   "ai": {
     "title": "AI 助手",
     "subtitle": "你的智能生產力小幫手，由 Qwen AI 驅動",
     "welcome": "👋 你好！我係你嘅 AI 助手。有咩可以幫到你？",
-    "askAnything": "你可以問我任何關於生產力、目標設定或時間管理嘅問題！",
-    "suggestions": "推薦問題：",
+    "askAnything": "你可以問我任何關於生產力、目標設定或時間管理嘅問題！",    "askQuestion": "問 AI 助手",    "suggestions": "推薦問題：",
     "thinking": "諗緊...",
     "inputPlaceholder": "喺度輸入你嘅問題...",
     "send": "發送",

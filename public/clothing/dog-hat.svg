@@ -1,0 +1,13 @@
+<svg width="120" height="100" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Top hat for dog -->
+  <!-- Brim -->
+  <ellipse cx="60" cy="75" rx="45" ry="10" fill="#2c2c2c" opacity="0.9"/>
+  <!-- Hat body -->
+  <rect x="35" y="25" width="50" height="50" rx="5" fill="#1a1a1a" opacity="0.85"/>
+  <!-- Hat top -->
+  <ellipse cx="60" cy="25" rx="25" ry="8" fill="#2c2c2c" opacity="0.9"/>
+  <!-- Highlight -->
+  <rect x="38" y="30" width="8" height="20" rx="4" fill="#ffffff" opacity="0.3"/>
+  <!-- Band -->
+  <rect x="32" y="60" width="56" height="8" rx="1" fill="#8B4513" opacity="0.9"/>
+</svg>

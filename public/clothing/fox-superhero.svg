@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 131 117">
+  <!-- Cape flowing -->
+  <path d="M 33 23 Q 24 27, 18 41 L 11 88 Q 9 99, 20 105 L 42 109 Q 51 111, 60 109 L 79 109 Q 88 111, 97 109 L 119 105 Q 130 99, 128 88 L 121 41 Q 116 27, 107 23" fill="#0000CD" opacity="0.9"/>
+  <!-- Cape movement lines -->
+  <path d="M 23 37 Q 20 50, 18 64" stroke="#1E90FF" stroke-width="2.7" fill="none" opacity="0.6"/>
+  <path d="M 116 37 Q 119 50, 121 64" stroke="#1E90FF" stroke-width="2.7" fill="none" opacity="0.6"/>
+  <!-- Collar with emblem -->
+  <ellipse cx="69.5" cy="26" rx="37" ry="9.5" fill="#FFD700" opacity="0.95"/>
+  <!-- Star emblem -->
+  <path d="M 69.5 19 L 72.5 26 L 80 26 L 74 30 L 76 37 L 69.5 33 L 63 37 L 65 30 L 59 26 L 66.5 26 Z" fill="#FF0000" opacity="0.95"/>
+  <!-- Highlights -->
+  <path d="M 37 27 Q 32 36, 29 50 L 27 42 Q 30 32, 35 26" fill="#ffffff" opacity="0.25"/>
+</svg>

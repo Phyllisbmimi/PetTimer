@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 112">
+  <!-- Cape body -->
+  <path d="M 29 19 Q 19 23, 14 36 L 9 82 Q 9 92, 19 96 L 56 100 Q 65 101, 74 100 L 111 96 Q 121 92, 121 82 L 116 36 Q 111 23, 101 19 Q 92 17, 83 19 L 47 19 Q 38 17, 29 19" fill="#8B0000" opacity="0.9"/>
+  <!-- Collar -->
+  <ellipse cx="65" cy="21" rx="32" ry="7.5" fill="#C41E3A" opacity="0.95"/>
+  <!-- Highlight -->
+  <path d="M 33 22 Q 31 27, 30 36 L 28 46 Q 28 42, 30 36 Q 32 28, 35 23" fill="#ffffff" opacity="0.25"/>
+  <!-- Gold clasp -->
+  <circle cx="65" cy="21" r="3.7" fill="#FFD700" opacity="0.95"/>
+</svg>

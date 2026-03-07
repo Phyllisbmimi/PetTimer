@@ -2,6 +2,7 @@ import React from 'react';
 import { Home, Target, Calendar, ShoppingBag, User, LogOut, Sparkles, Bot, LogIn } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
+import { useAppStore } from '../store/appStore';
 import LanguageSwitcher from './LanguageSwitcher';
 
 interface NavBarProps {
@@ -9,11 +10,13 @@ interface NavBarProps {
   onNavigate: (page: 'home' | 'goals' | 'checkin' | 'shop' | 'animals' | 'ai' | 'profile') => void;
   coins: number;
   fire: number;
+  navigationLocked?: boolean;
 }
 
-export const NavBar: React.FC<NavBarProps> = ({ currentPage, onNavigate, coins, fire }) => {
+export const NavBar: React.FC<NavBarProps> = ({ currentPage, onNavigate, coins, fire, navigationLocked = false }) => {
   const { t } = useTranslation();
   const { logout, user, isGuest } = useAuthStore();
+  const { saveActivityToBackend } = useAppStore();
 
   const navItems = [
     { id: 'home', label: t('nav.home'), icon: Home },
@@ -25,8 +28,12 @@ export const NavBar: React.FC<NavBarProps> = ({ currentPage, onNavigate, coins, 
     { id: 'profile', label: t('nav.profile'), icon: User },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (confirm('確定要登出嗎？')) {
+      console.log('🚪 Logout initiated - saving data before logout...');
+      // 保存數據到後端再登出
+      await saveActivityToBackend();
+      console.log('✅ Data saved, logging out...');
       logout();
       window.location.reload();
     }
@@ -47,16 +54,20 @@ export const NavBar: React.FC<NavBarProps> = ({ currentPage, onNavigate, coins, 
             <div className="flex items-center gap-1 md:gap-2 w-max pr-2">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isDisabled = navigationLocked && currentPage !== item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() =>
-                    onNavigate(item.id as 'home' | 'goals' | 'checkin' | 'shop' | 'animals' | 'profile')
+                    onNavigate(item.id as 'home' | 'goals' | 'checkin' | 'shop' | 'animals' | 'ai' | 'profile')
                   }
+                  disabled={isDisabled}
                   className={`p-2 rounded-lg transition-all flex items-center gap-2 shrink-0 ${
                     currentPage === item.id
                       ? 'bg-accent text-dark font-bold'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      : isDisabled
+                        ? 'text-white/30 cursor-not-allowed'
+                        : 'text-white/70 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <Icon className="w-5 h-5" />

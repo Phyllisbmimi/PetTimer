@@ -1,4 +1,5 @@
 {
+  "lang": "en",
   "common": {
     "appName": "PetTimer",
     "appDescription": "Pet Care + Pomodoro Timer with Goal Tracking",
@@ -35,8 +36,8 @@
     "pomodoroComplete": "🎉 Completed one pomodoro! Earned 1 fire and 5 coins"
   },
   "pet": {
-    "level": "Level {level}",
-    "experience": "Experience {exp}",
+    "level": "Level {{level}}",
+    "experience": "Experience {{exp}}",
     "stage": "Stage",
     "nextLevel": "Next level",
     "hunger": "Hunger",
@@ -146,7 +147,7 @@
     "buy": "Buy",
     "insufficientCoins": "Not enough coins",
     "tip": "Complete more pomodoros to earn coins and fire!",
-    "purchaseSuccess": "Successfully purchased {item}!"
+    "purchaseSuccess": "Successfully purchased {{item}}!"
   },
   "profile": {
     "title": "Profile",
@@ -186,6 +187,7 @@
     "voiceError": "Voice chat error occurred",
     "typeMessage": "Type your message...",
     "send": "Send",
+    "yummy": "Yummy!",
     "autoCloseIn5sec": "Auto-close in 5 seconds, or click X to close now"
   },
   "petSelector": {
@@ -271,13 +273,14 @@
     "minimalDark": "Minimal Dark",
     "minimalDarkDesc": "Plain black background with white text",
     "minimalLight": "Minimal Light",
-    "minimalLightDesc": "Plain white background with white text"
+    "minimalLightDesc": "Plain white background with black text"
   },
   "ai": {
     "title": "AI Assistant",
     "subtitle": "Your productivity companion powered by Qwen AI",
     "welcome": "👋 Hello! I'm your AI assistant. How can I help you today?",
     "askAnything": "Ask me anything about productivity, goal setting, or time management!",
+    "askQuestion": "Ask AI Assistant",
     "suggestions": "Suggested Questions:",
     "thinking": "Thinking...",
     "inputPlaceholder": "Type your question here...",

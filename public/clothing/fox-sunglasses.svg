@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 47">
+  <!-- Frame -->
+  <rect x="5" y="14" width="37" height="23" rx="7.5" fill="#1a1a1a" opacity="0.9"/>
+  <rect x="70" y="14" width="37" height="23" rx="7.5" fill="#1a1a1a" opacity="0.9"/>
+  <!-- Bridge -->
+  <rect x="42" y="22" width="28" height="5.5" rx="2.7" fill="#1a1a1a" opacity="0.9"/>
+  <!-- Lenses -->
+  <rect x="7.5" y="17" width="32" height="17" rx="5.5" fill="#000000" opacity="0.85"/>
+  <rect x="72.5" y="17" width="32" height="17" rx="5.5" fill="#000000" opacity="0.85"/>
+  <!-- Reflections -->
+  <rect x="10.5" y="19" width="11.5" height="5.5" rx="2" fill="#ffffff" opacity="0.4"/>
+  <rect x="75.5" y="19" width="11.5" height="5.5" rx="2" fill="#ffffff" opacity="0.4"/>
+  <!-- Temple arms -->
+  <rect x="107" y="21" width="3" height="9" rx="1.5" fill="#1a1a1a" opacity="0.8"/>
+  <rect x="2" y="21" width="3" height="9" rx="1.5" fill="#1a1a1a" opacity="0.8"/>
+</svg>

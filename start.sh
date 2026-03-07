@@ -28,11 +28,15 @@ if [ ! -f ".env" ]; then
     echo -e "${GREEN}✓ .env 已創建${NC}"
 fi
 
-# 檢查 API key
-if grep -q "DASHSCOPE_API_KEY=$" .env; then
-    echo -e "${RED}⚠️  DASHSCOPE_API_KEY 未設置（空值）${NC}"
+# 檢查 API key（支援 DASHSCOPE_API_KEY 或 VITE_DASHSCOPE_API_KEY）
+dashscope_key=$(grep -E '^DASHSCOPE_API_KEY=' .env | head -1 | cut -d'=' -f2- | tr -d '"' | xargs)
+vite_dashscope_key=$(grep -E '^VITE_DASHSCOPE_API_KEY=' .env | head -1 | cut -d'=' -f2- | tr -d '"' | xargs)
+
+if [ -z "$dashscope_key" ] && [ -z "$vite_dashscope_key" ]; then
+    echo -e "${RED}⚠️  AI API key 未設置（DASHSCOPE_API_KEY / VITE_DASHSCOPE_API_KEY）${NC}"
     echo -e "${YELLOW}請編輯 .env 文件，填入你的 DashScope API key${NC}"
-    echo -e "${YELLOW}格式: DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx${NC}"
+    echo -e "${YELLOW}格式 1: DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx${NC}"
+    echo -e "${YELLOW}格式 2: VITE_DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxx${NC}"
     echo ""
     echo -e "${BLUE}編輯命令: vim .env${NC}"
     echo -e "${BLUE}或使用 VS Code 打開 .env 文件${NC}"
@@ -44,7 +48,12 @@ if grep -q "DASHSCOPE_API_KEY=$" .env; then
         exit 1
     fi
 else
-    echo -e "${GREEN}✓ DASHSCOPE_API_KEY 已設置${NC}"
+    if [ -n "$dashscope_key" ]; then
+        echo -e "${GREEN}✓ DASHSCOPE_API_KEY 已設置${NC}"
+    fi
+    if [ -n "$vite_dashscope_key" ]; then
+        echo -e "${GREEN}✓ VITE_DASHSCOPE_API_KEY 已設置${NC}"
+    fi
 fi
 
 # 2. 設置 Node 環境

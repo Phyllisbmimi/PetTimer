@@ -14,12 +14,18 @@ export const CheckInCalendar: React.FC<CheckInCalendarProps> = ({
   onAddCheckIn,
   streak,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showCheckInForm, setShowCheckInForm] = useState(false);
   const [activities, setActivities] = useState<string[]>([]);
   const [mood, setMood] = useState<'happy' | 'normal' | 'tired'>('happy');
   const [notes, setNotes] = useState('');
+
+  const getLocale = () => {
+    if (i18n.language === 'zh-HK') return 'zh-HK';
+    if (i18n.language === 'zh-CN') return 'zh-CN';
+    return 'en-US';
+  };
 
   const daysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -30,12 +36,16 @@ export const CheckInCalendar: React.FC<CheckInCalendarProps> = ({
   };
 
   const monthName = (date: Date) => {
-    const months = [
-      '1月', '2月', '3月', '4月', '5月', '6月',
-      '7月', '8月', '9月', '10月', '11月', '12月',
-    ];
-    return months[date.getMonth()];
+    return new Intl.DateTimeFormat(getLocale(), {
+      year: 'numeric',
+      month: 'long',
+    }).format(date);
   };
+
+  const weekdayLabels =
+    i18n.language === 'en'
+      ? ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      : ['日', '一', '二', '三', '四', '五', '六'];
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
@@ -136,7 +146,7 @@ export const CheckInCalendar: React.FC<CheckInCalendarProps> = ({
             <ChevronLeft className="w-6 h-6" />
           </button>
           <h3 className="text-xl font-bold text-white">
-            {currentDate.getFullYear()} 年 {monthName(currentDate)}
+            {monthName(currentDate)}
           </h3>
           <button onClick={handleNextMonth} className="text-white/60 hover:text-white">
             <ChevronRight className="w-6 h-6" />
@@ -148,7 +158,7 @@ export const CheckInCalendar: React.FC<CheckInCalendarProps> = ({
       <div className="bg-white/5 rounded-xl p-4 border border-white/10">
         {/* 週日標題 */}
         <div className="grid grid-cols-7 gap-2 mb-3">
-          {['日', '一', '二', '三', '四', '五', '六'].map((day) => (
+          {weekdayLabels.map((day) => (
             <div key={day} className="text-center text-white/60 font-semibold text-sm">
               {day}
             </div>

@@ -1,0 +1,13 @@
+<svg width="110" height="95" viewBox="0 0 110 95" xmlns="http://www.w3.org/2000/svg">
+  <!-- Small hat for cat -->
+  <!-- Brim -->
+  <ellipse cx="55" cy="70" rx="42" ry="9" fill="#2c2c2c" opacity="0.9"/>
+  <!-- Hat body -->
+  <rect x="32" y="22" width="46" height="48" rx="5" fill="#1a1a1a" opacity="0.85"/>
+  <!-- Hat top -->
+  <ellipse cx="55" cy="22" rx="23" ry="7" fill="#2c2c2c" opacity="0.9"/>
+  <!-- Highlight -->
+  <rect x="35" y="27" width="7" height="18" rx="3" fill="#ffffff" opacity="0.3"/>
+  <!-- Band -->
+  <rect x="30" y="57" width="50" height="7" rx="1" fill="#8B4513" opacity="0.9"/>
+</svg>

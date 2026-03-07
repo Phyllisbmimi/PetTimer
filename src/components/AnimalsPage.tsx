@@ -9,11 +9,12 @@ interface AnimalsPageProps {
   pet: Pet;
   onFeed: () => void;
   onPet: () => void;
+  onConsumeItem: (itemId: string) => void;
 }
 
 type Background = 'home' | 'forest' | 'city' | 'castle';
 
-const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
+const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet, onConsumeItem }) => {
   const { t, i18n } = useTranslation();
   const [selectedBackground, setSelectedBackground] = useState<Background>('home');
   const [showReaction, setShowReaction] = useState(false);
@@ -21,6 +22,8 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
   const [selectedClothing, setSelectedClothing] = useState<PetItem | null>(null);
   const [selectedFood, setSelectedFood] = useState<PetItem | null>(null);
   const [selectedToy, setSelectedToy] = useState<PetItem | null>(null);
+  const [isEating, setIsEating] = useState(false);
+  const [feedResponse, setFeedResponse] = useState('');
   const [activeTab, setActiveTab] = useState<'clothing' | 'food' | 'toy'>('food');
   
   // 語音對話狀態
@@ -30,6 +33,16 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
   const [textInput, setTextInput] = useState('');
   const [useTextMode, setUseTextMode] = useState(!speechService.isRecognitionSupported());
   const imageBaseUrl = import.meta.env.BASE_URL;
+  const [petImageIndex, setPetImageIndex] = useState(0);
+  const [petPosition, setPetPosition] = useState({ x: 50, y: 52 });
+  const [isDraggingPet, setIsDraggingPet] = useState(false);
+  const sceneRef = React.useRef<HTMLDivElement | null>(null);
+  const petRef = React.useRef<HTMLDivElement | null>(null);
+  const dragOffsetRef = React.useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    setPetImageIndex(0);
+  }, [pet.type]);
 
   // 根據當前語言設置語音識別語言
   useEffect(() => {
@@ -64,8 +77,14 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
 
   const handleFeedPet = (foodItem: PetItem) => {
     setSelectedFood(foodItem);
+    setIsEating(true);
+    setFeedResponse(t('animals.yummy') || 'Yummy!');
     onFeed();
-    setTimeout(() => setSelectedFood(null), 1500);
+    onConsumeItem(foodItem.id);
+
+    setTimeout(() => setSelectedFood(null), 900);
+    setTimeout(() => setIsEating(false), 1200);
+    setTimeout(() => setFeedResponse(''), 1800);
   };
 
   const handleWearClothing = (clothingItem: PetItem) => {
@@ -162,34 +181,155 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
     return bg ? bg.image : backgrounds[0].image;
   };
 
+  const getPetImageCandidates = () => {
+    if (pet.type === 'dog') return [`${imageBaseUrl}backgrounds/dog.png`, `${imageBaseUrl}backgrounds/dog.jpg`];
+    if (pet.type === 'cat') return [`${imageBaseUrl}backgrounds/cat.png`, `${imageBaseUrl}backgrounds/cat.jpg`];
+    return [`${imageBaseUrl}backgrounds/fox.png`, `${imageBaseUrl}backgrounds/fox.jpg`];
+  };
+
+  const getPetImageSrc = () => {
+    const candidates = getPetImageCandidates();
+    return candidates[Math.min(petImageIndex, candidates.length - 1)];
+  };
+
+  const handlePetImageError = () => {
+    const candidates = getPetImageCandidates();
+    if (petImageIndex < candidates.length - 1) {
+      setPetImageIndex((index) => index + 1);
+    }
+  };
+
+  const clamp = (value: number, min: number, max: number) => {
+    return Math.min(Math.max(value, min), max);
+  };
+
+  const handlePetPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const sceneElement = sceneRef.current;
+    const petElement = petRef.current;
+    if (!sceneElement || !petElement) return;
+
+    const sceneRect = sceneElement.getBoundingClientRect();
+    const petRect = petElement.getBoundingClientRect();
+    const petCenterX = petRect.left - sceneRect.left + petRect.width / 2;
+    const petCenterY = petRect.top - sceneRect.top + petRect.height / 2;
+    const pointerX = e.clientX - sceneRect.left;
+    const pointerY = e.clientY - sceneRect.top;
+
+    dragOffsetRef.current = {
+      x: pointerX - petCenterX,
+      y: pointerY - petCenterY,
+    };
+
+    e.preventDefault();
+    setIsDraggingPet(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePetPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingPet) return;
+
+    const sceneElement = sceneRef.current;
+    const petElement = petRef.current;
+    if (!sceneElement || !petElement) return;
+
+    const sceneRect = sceneElement.getBoundingClientRect();
+    const petRect = petElement.getBoundingClientRect();
+    const halfPetWidth = petRect.width / 2;
+    const halfPetHeight = petRect.height / 2;
+
+    const rawCenterX = e.clientX - sceneRect.left - dragOffsetRef.current.x;
+    const rawCenterY = e.clientY - sceneRect.top - dragOffsetRef.current.y;
+
+    const clampedCenterX = clamp(rawCenterX, halfPetWidth, sceneRect.width - halfPetWidth);
+    const clampedCenterY = clamp(rawCenterY, halfPetHeight, sceneRect.height - halfPetHeight);
+
+    setPetPosition({
+      x: (clampedCenterX / sceneRect.width) * 100,
+      y: (clampedCenterY / sceneRect.height) * 100,
+    });
+  };
+
+  const handlePetPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDraggingPet) {
+      setIsDraggingPet(false);
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    }
+  };
+
+  // 获取衣服图片路径（如果存在）
+  const getClothingImagePath = () => {
+    if (!selectedClothing) return null;
+    const clothingKey = getClothingKey();
+    
+    // 所有衣服都有自定义SVG图片
+    const clothingItems = ['hat', 'cloak', 'crown', 'bow', 'sunglasses', 'scarf', 'superhero'];
+    if (clothingItems.includes(clothingKey)) {
+      return `${imageBaseUrl}clothing/${pet.type}-${clothingKey}.svg`;
+    }
+    
+    return null; // 如果找不到对应的衣服类型，返回null
+  };
+
   const getClothingEmoji = () => {
     if (!selectedClothing) return null;
-    // 根據物品名稱返回對應的 emoji（這裡需要與 Shop.tsx 的物品對應）
     const clothingMap: Record<string, string> = {
-      '小帽子': '🎩',
-      '披風': '🧥',
-      '皇冠': '👑',
-      '蝴蝶結': '🎀',
-      '太陽眼鏡': '🕶️',
-      '圍巾': '🧣',
-      '超級英雄套裝': '🦸',
-      '校園背包': '🎒',
+      hat: '🎩',
+      cloak: '🧥',
+      crown: '👑',
+      bow: '🎀',
+      sunglasses: '🕶️',
+      scarf: '🧣',
+      superhero: '🦸',
+      小帽子: '🎩',
+      披風: '🧥',
+      皇冠: '👑',
+      蝴蝶結: '🎀',
+      太陽眼鏡: '🕶️',
+      圍巾: '🧣',
+      超級英雄套裝: '🦸',
     };
     return clothingMap[selectedClothing.name] || '👕';
+  };
+
+  // 渲染衣服（优先使用图片，否则使用emoji）
+  const renderClothing = () => {
+    const imagePath = getClothingImagePath();
+    if (imagePath) {
+      return (
+        <img 
+          src={imagePath} 
+          alt="clothing" 
+          className="w-full h-full object-contain filter drop-shadow-lg"
+          style={{ opacity: 0.95 }}
+        />
+      );
+    }
+    return <span>{getClothingEmoji()}</span>;
   };
 
   const getFoodEmoji = () => {
     if (!selectedFood) return null;
     const foodMap: Record<string, string> = {
-      '骨頭': '🦴',
-      '魚': '🐟',
-      '蛋糕': '🎂',
-      '壽司': '🍣',
-      '胡蘿蔔': '🥕',
-      '甜甜圈': '🍩',
-      '牛奶': '🥛',
-      '蜂蜜罐': '🍯',
-      '皇家大餐': '🍱',
+      bone: '🦴',
+      fish: '🐟',
+      cake: '🎂',
+      sushi: '🍣',
+      carrot: '🥕',
+      donut: '🍩',
+      milk: '🥛',
+      honey: '🍯',
+      royalMeal: '🍱',
+      骨頭: '🦴',
+      魚: '🐟',
+      蛋糕: '🎂',
+      壽司: '🍣',
+      胡蘿蔔: '🥕',
+      甜甜圈: '🍩',
+      牛奶: '🥛',
+      蜂蜜罐: '🍯',
+      皇家大餐: '🍱',
     };
     return foodMap[selectedFood.name] || '🍖';
   };
@@ -197,16 +337,143 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
   const getToyEmoji = () => {
     if (!selectedToy) return null;
     const toyMap: Record<string, string> = {
-      '球': '🎾',
-      '毛球': '🧶',
-      '飛盤': '🥏',
-      '橡皮鴨': '🦆',
-      '拼圖盒': '🧩',
-      '迷你鋼琴': '🎹',
-      '遙控車': '🚗',
-      '星星魔杖': '🪄',
+      ball: '🎾',
+      yarn: '🧶',
+      frisbee: '🥏',
+      duck: '🦆',
+      puzzle: '🧩',
+      piano: '🎹',
+      car: '🚗',
+      wand: '🪄',
+      球: '🎾',
+      毛球: '🧶',
+      飛盤: '🥏',
+      橡皮鴨: '🦆',
+      拼圖盒: '🧩',
+      迷你鋼琴: '🎹',
+      遙控車: '🚗',
+      星星魔杖: '🪄',
     };
     return toyMap[selectedToy.name] || '🎮';
+  };
+
+  const isHatSelected =
+    selectedClothing?.name === 'hat' || selectedClothing?.name === '小帽子';
+  const isSunglassesSelected =
+    selectedClothing?.name === 'sunglasses' || selectedClothing?.name === '太陽眼鏡';
+
+  const getClothingKey = () => {
+    if (!selectedClothing) return '';
+
+    const map: Record<string, string> = {
+      hat: 'hat',
+      小帽子: 'hat',
+      cloak: 'cloak',
+      披風: 'cloak',
+      crown: 'crown',
+      皇冠: 'crown',
+      bow: 'bow',
+      蝴蝶結: 'bow',
+      sunglasses: 'sunglasses',
+      太陽眼鏡: 'sunglasses',
+      scarf: 'scarf',
+      圍巾: 'scarf',
+      superhero: 'superhero',
+      超級英雄套裝: 'superhero',
+    };
+
+    return map[selectedClothing.name] || '';
+  };
+
+  const getClothingPositionClass = () => {
+    const clothingKey = getClothingKey();
+    const hasImage = getClothingImagePath() !== null;
+
+    // 所有衣服使用图片时的样式
+    if (hasImage) {
+      if (clothingKey === 'hat') {
+        if (pet.type === 'dog') return 'absolute -top-8 left-1/2 -translate-x-1/2 w-24 h-20';
+        if (pet.type === 'cat') return 'absolute -top-7 left-1/2 -translate-x-1/2 w-22 h-19';
+        return 'absolute -top-7 left-1/2 -translate-x-1/2 w-23 h-19'; // fox
+      }
+      
+      if (clothingKey === 'cloak') {
+        if (pet.type === 'dog') return 'absolute top-[80%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-36';
+        if (pet.type === 'cat') return 'absolute top-[80%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-32';
+        return 'absolute top-[80%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-38 h-34'; // fox
+      }
+      
+      if (clothingKey === 'crown') {
+        if (pet.type === 'dog') return 'absolute -top-6 left-1/2 -translate-x-1/2 w-28 h-20';
+        if (pet.type === 'cat') return 'absolute -top-5 left-1/2 -translate-x-1/2 w-24 h-17';
+        return 'absolute -top-5 left-1/2 -translate-x-1/2 w-26 h-18'; // fox
+      }
+      
+      if (clothingKey === 'bow') {
+        if (pet.type === 'dog') return 'absolute top-[62%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-14';
+        if (pet.type === 'cat') return 'absolute top-[64%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-18 h-12';
+        return 'absolute top-[63%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-19 h-13'; // fox
+      }
+      
+      if (clothingKey === 'sunglasses') {
+        if (pet.type === 'dog') return 'absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-10';
+        if (pet.type === 'cat') return 'absolute top-[47%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-8';
+        return 'absolute top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-22 h-9'; // fox
+      }
+      
+      if (clothingKey === 'scarf') {
+        if (pet.type === 'dog') return 'absolute top-[68%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-22';
+        if (pet.type === 'cat') return 'absolute top-[70%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-25 h-20';
+        return 'absolute top-[69%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-26 h-21'; // fox
+      }
+      
+      if (clothingKey === 'superhero') {
+        if (pet.type === 'dog') return 'absolute top-[76%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-32';
+        if (pet.type === 'cat') return 'absolute top-[76%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-28';
+        return 'absolute top-[76%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-34 h-30'; // fox
+      }
+      
+    }
+
+    // Fallback for emoji (如果没有图片)
+    if (clothingKey === 'cloak') {
+      return 'absolute top-[64%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl drop-shadow-lg';
+    }
+
+    if (clothingKey === 'scarf') {
+      return 'absolute top-[70%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl drop-shadow-lg';
+    }
+
+    if (clothingKey === 'superhero') {
+      return 'absolute top-[68%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl drop-shadow-lg';
+    }
+
+
+    if (clothingKey === 'bow') {
+      return 'absolute top-[66%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl drop-shadow-lg';
+    }
+
+    if (clothingKey === 'crown') {
+      return 'absolute top-[12%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl drop-shadow-lg';
+    }
+
+    if (isSunglassesSelected) {
+      if (pet.type === 'dog') {
+        return 'absolute top-[41%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-7xl drop-shadow-lg';
+      }
+
+      return 'absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl drop-shadow-lg';
+    }
+
+    if (!isHatSelected) {
+      return 'absolute top-[24%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl drop-shadow-lg';
+    }
+
+    if (pet.type === 'dog') {
+      return 'absolute -top-12 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg';
+    }
+
+    return 'absolute -top-10 left-1/2 -translate-x-1/2 text-5xl drop-shadow-lg';
   };
 
   return (
@@ -324,6 +591,7 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
 
       {/* 主要動物展示區域 */}
       <div 
+        ref={sceneRef}
         className="relative overflow-hidden rounded-3xl p-8 min-h-[400px] flex items-center justify-center border-4 border-white/30 shadow-2xl"
         style={{
           backgroundImage: `url(${getBackgroundStyle()})`,
@@ -386,24 +654,43 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
 
         {/* 動物主體（可點擊） */}
         <div 
+          ref={petRef}
           onClick={handlePetClick}
-          className="relative cursor-pointer transform transition-transform hover:scale-110 active:scale-95 z-20"
+          onPointerDown={handlePetPointerDown}
+          onPointerMove={handlePetPointerMove}
+          onPointerUp={handlePetPointerUp}
+          onPointerCancel={handlePetPointerUp}
+          className={`absolute cursor-grab select-none touch-none transform transition-transform active:scale-95 z-20 ${
+            isDraggingPet ? 'scale-110 cursor-grabbing' : 'hover:scale-110'
+          }`}
+          style={{
+            left: `${petPosition.x}%`,
+            top: `${petPosition.y}%`,
+            transform: 'translate(-50%, -50%)',
+            touchAction: 'none',
+          }}
         >
           {/* 動物完整形象 */}
           <div className="flex flex-col items-center gap-4">
-            {/* 主要動物 emoji（完整形象） */}
+            {/* 主要動物圖片 */}
             <div className="relative">
-              <div className="text-[10rem] leading-none">
-                {pet.type === 'dog' && '🐕'}
-                {pet.type === 'cat' && '🐈'}
-                {pet.type === 'fox' && '🦊'}
-              </div>
+              <img
+                src={getPetImageSrc()}
+                alt={pet.name}
+                className="w-56 h-56 object-contain drop-shadow-2xl"
+                draggable={false}
+                onError={handlePetImageError}
+              />
               
-              {/* 衣服配飾在右上角 */}
+              {/* 衣服配飾 */}
               {selectedClothing && (
-                <div className="absolute -top-6 -right-6 text-5xl animate-bounce drop-shadow-lg">
-                  {getClothingEmoji()}
+                <div className={getClothingPositionClass()}>
+                  {renderClothing()}
                 </div>
+              )}
+
+              {isEating && (
+                <div className="absolute left-1/2 bottom-10 -translate-x-1/2 w-8 h-4 bg-black/70 rounded-b-full animate-pulse"></div>
               )}
             </div>
             
@@ -418,6 +705,12 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
           {showReaction && (
             <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 text-5xl animate-bounce drop-shadow-xl">
               {reaction}
+            </div>
+          )}
+
+          {feedResponse && (
+            <div className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white/90 text-dark font-bold px-4 py-1 rounded-full shadow-lg animate-bounce">
+              {feedResponse}
             </div>
           )}
 
@@ -437,8 +730,8 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
         </div>
 
         {/* 寵物資訊 */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 rounded-full px-6 py-2 shadow-lg z-20">
-          <p className="text-dark font-bold text-center">
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm rounded-full px-6 py-2 shadow-xl border-2 border-white z-20">
+          <p className="text-gray-800 font-bold text-center text-lg">
             {pet.name} | Lv.{pet.level}
           </p>
         </div>
@@ -491,15 +784,15 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
               className="bg-white/10 hover:bg-white/20 rounded-xl p-3 transition-all transform hover:scale-105"
             >
               <div className="text-3xl mb-1">
-                {item.name === '骨頭' && '🦴'}
-                {item.name === '魚' && '🐟'}
-                {item.name === '蛋糕' && '🎂'}
-                {item.name === '壽司' && '🍣'}
-                {item.name === '胡蘿蔔' && '🥕'}
-                {item.name === '甜甜圈' && '🍩'}
-                {item.name === '牛奶' && '🥛'}
-                {item.name === '蜂蜜罐' && '🍯'}
-                {item.name === '皇家大餐' && '🍱'}
+                {(item.name === 'bone' || item.name === '骨頭') && '🦴'}
+                {(item.name === 'fish' || item.name === '魚') && '🐟'}
+                {(item.name === 'cake' || item.name === '蛋糕') && '🎂'}
+                {(item.name === 'sushi' || item.name === '壽司') && '🍣'}
+                {(item.name === 'carrot' || item.name === '胡蘿蔔') && '🥕'}
+                {(item.name === 'donut' || item.name === '甜甜圈') && '🍩'}
+                {(item.name === 'milk' || item.name === '牛奶') && '🥛'}
+                {(item.name === 'honey' || item.name === '蜂蜜罐') && '🍯'}
+                {(item.name === 'royalMeal' || item.name === '皇家大餐') && '🍱'}
               </div>
               <p className="text-white text-xs font-semibold truncate">{item.name}</p>
             </button>
@@ -519,14 +812,13 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
               }`}
             >
               <div className="text-3xl mb-1">
-                {item.name === '小帽子' && '🎩'}
-                {item.name === '披風' && '🧥'}
-                {item.name === '皇冠' && '👑'}
-                {item.name === '蝴蝶結' && '🎀'}
-                {item.name === '太陽眼鏡' && '🕶️'}
-                {item.name === '圍巾' && '🧣'}
-                {item.name === '超級英雄套裝' && '🦸'}
-                {item.name === '校園背包' && '🎒'}
+                {(item.name === 'hat' || item.name === '小帽子') && '🎩'}
+                {(item.name === 'cloak' || item.name === '披風') && '🧥'}
+                {(item.name === 'crown' || item.name === '皇冠') && '👑'}
+                {(item.name === 'bow' || item.name === '蝴蝶結') && '🎀'}
+                {(item.name === 'sunglasses' || item.name === '太陽眼鏡') && '🕶️'}
+                {(item.name === 'scarf' || item.name === '圍巾') && '🧣'}
+                {(item.name === 'superhero' || item.name === '超級英雄套裝') && '🦸'}
               </div>
               <p className={`text-xs font-semibold truncate ${selectedClothing?.id === item.id ? 'text-dark' : 'text-white'}`}>
                 {item.name}
@@ -544,14 +836,14 @@ const AnimalsPage: React.FC<AnimalsPageProps> = ({ pet, onFeed, onPet }) => {
               className="bg-white/10 hover:bg-white/20 rounded-xl p-3 transition-all transform hover:scale-105"
             >
               <div className="text-3xl mb-1">
-                {item.name === '球' && '🎾'}
-                {item.name === '毛球' && '🧶'}
-                {item.name === '飛盤' && '🥏'}
-                {item.name === '橡皮鴨' && '🦆'}
-                {item.name === '拼圖盒' && '🧩'}
-                {item.name === '迷你鋼琴' && '🎹'}
-                {item.name === '遙控車' && '🚗'}
-                {item.name === '星星魔杖' && '🪄'}
+                {(item.name === 'ball' || item.name === '球') && '🎾'}
+                {(item.name === 'yarn' || item.name === '毛球') && '🧶'}
+                {(item.name === 'frisbee' || item.name === '飛盤') && '🥏'}
+                {(item.name === 'duck' || item.name === '橡皮鴨') && '🦆'}
+                {(item.name === 'puzzle' || item.name === '拼圖盒') && '🧩'}
+                {(item.name === 'piano' || item.name === '迷你鋼琴') && '🎹'}
+                {(item.name === 'car' || item.name === '遙控車') && '🚗'}
+                {(item.name === 'wand' || item.name === '星星魔杖') && '🪄'}
               </div>
               <p className="text-white text-xs font-semibold truncate">{item.name}</p>
             </button>

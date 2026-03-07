@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 62">
+  <!-- Left bow -->
+  <ellipse cx="25" cy="31" rx="19" ry="25" fill="#FF69B4" opacity="0.9"/>
+  <!-- Right bow -->
+  <ellipse cx="63" cy="31" rx="19" ry="25" fill="#FF69B4" opacity="0.9"/>
+  <!-- Center knot -->
+  <rect x="37" y="22" width="14" height="18" rx="3" fill="#FF1493" opacity="0.95"/>
+  <!-- Highlights -->
+  <ellipse cx="21" cy="25" rx="7" ry="11" fill="#ffffff" opacity="0.35"/>
+  <ellipse cx="67" cy="25" rx="7" ry="11" fill="#ffffff" opacity="0.35"/>
+  <!-- Center highlight -->
+  <rect x="39" y="24" width="3.5" height="11" rx="1.5" fill="#ffffff" opacity="0.3"/>
+</svg>

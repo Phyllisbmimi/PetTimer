@@ -167,7 +167,7 @@ const getErrorMessage = (error: unknown) => {
     if (error.message.includes('expected pattern')) {
       return '請求網址格式錯誤，已切換為完整 API 路徑，請更新到最新版本後再試。';
     }
-    return '網路連線或 CORS 錯誤，請確認已設定 DASHSCOPE_API_KEY 並重新啟動開發伺服器';
+    return '網路連線或 CORS 錯誤，請確認已設定 DASHSCOPE_API_KEY（或 VITE_DASHSCOPE_API_KEY）並重新啟動開發伺服器';
   }
 
   if (error instanceof Error) {
@@ -179,7 +179,7 @@ const getErrorMessage = (error: unknown) => {
 
 const getApiErrorMessage = async (response: Response) => {
   if (response.status === 401) {
-    return 'API 授權失敗（401）：請檢查 DASHSCOPE_API_KEY 是否正確，並重新啟動開發伺服器';
+    return 'API 授權失敗（401）：請檢查 DASHSCOPE_API_KEY（或 VITE_DASHSCOPE_API_KEY）是否正確，並重新啟動開發伺服器';
   }
 
   try {

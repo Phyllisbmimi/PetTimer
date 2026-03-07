@@ -133,10 +133,14 @@ AI 功能透過 Vite 開發代理呼叫 DashScope，避免瀏覽器 CORS 導致 
 cp .env.example .env
 ```
 
-2. 在 `.env` 內填入你的金鑰：
+2. 在 `.env` 內填入你的金鑰（兩種鍵名都可）：
 
 ```bash
+# 推薦（給 Vite 開發代理）
 DASHSCOPE_API_KEY="你的 DashScope API Key"
+
+# 或者（前端/桌面端相容）
+VITE_DASHSCOPE_API_KEY="你的 DashScope API Key"
 ```
 
 3. 重新啟動開發伺服器：
@@ -145,7 +149,7 @@ DASHSCOPE_API_KEY="你的 DashScope API Key"
 npm run dev
 ```
 
-如果未設定 `DASHSCOPE_API_KEY`，AI 請求會失敗。
+如果兩者都未設定（`DASHSCOPE_API_KEY` 與 `VITE_DASHSCOPE_API_KEY`），AI 請求會失敗。
 
 ### 自定義 Hooks
 - `usePetState`：寵物狀態的自動管理

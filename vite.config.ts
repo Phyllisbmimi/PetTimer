@@ -4,7 +4,11 @@ import path from 'path'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiKey = env.DASHSCOPE_API_KEY || process.env.DASHSCOPE_API_KEY
+  const apiKey =
+    env.DASHSCOPE_API_KEY ||
+    env.VITE_DASHSCOPE_API_KEY ||
+    process.env.DASHSCOPE_API_KEY ||
+    process.env.VITE_DASHSCOPE_API_KEY
 
   return {
     plugins: [react()],
