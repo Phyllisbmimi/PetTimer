@@ -5,9 +5,11 @@ const isTauri =
   typeof window !== 'undefined' &&
   ('__TAURI__' in window || '__TAURI_INTERNALS__' in window);
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
 const AUTH_API_BASE = isTauri
-  ? import.meta.env.VITE_AUTH_API_BASE_URL || 'http://localhost:3001/api/auth'
-  : '/api/auth';
+  ? import.meta.env.VITE_AUTH_API_BASE_URL || (API_BASE_URL ? `${API_BASE_URL}/api/auth` : 'http://localhost:3001/api/auth')
+  : `${API_BASE_URL}/api/auth`;
 
 const toUserFriendlyError = (error: unknown, fallback: string) => {
   if (error instanceof TypeError) {

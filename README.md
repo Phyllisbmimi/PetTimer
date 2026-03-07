@@ -151,6 +151,77 @@ npm run dev
 
 如果兩者都未設定（`DASHSCOPE_API_KEY` 與 `VITE_DASHSCOPE_API_KEY`），AI 請求會失敗。
 
+## 🌍 已部署版本（給評審直接使用）
+
+如果你要讓評審「不用跑程式」直接測試，建議部署為：
+
+- 前端：Vercel / Netlify
+- 後端：Render / Railway（提供 `/api/auth`、`/api/email`、`/api/qwen`）
+
+### 1) 後端環境變數（部署平台）
+
+在後端平台設定：
+
+```env
+PORT=3001
+FRONTEND_URL=https://你的前端網址
+DASHSCOPE_API_KEY=你的DashScopeKey
+JWT_SECRET=一段隨機字串
+```
+
+> `DASHSCOPE_API_KEY` 只放在後端平台，不要放 GitHub。
+
+### 2) 前端環境變數（部署平台）
+
+```env
+VITE_API_BASE_URL=https://你的後端網址
+```
+
+前端會透過 `VITE_API_BASE_URL` 呼叫：
+
+- `${VITE_API_BASE_URL}/api/auth`
+- `${VITE_API_BASE_URL}/api/qwen`
+
+### 3) 提交給評審時提供
+
+- GitHub repo 連結（不含任何 secret）
+- 已部署 Demo URL
+- （如需要）測試帳號
+
+這樣評審只要打開網址就能用，不需要本地配置 `.env`。
+
+### 我幫你做到哪一步？
+
+我已經在專案加好部署配置檔：
+
+- `render.yaml`（後端 Render 配置）
+- `vercel.json`（前端 Vercel SPA 路由配置）
+
+你仍然需要在 Render / Vercel 網站上填入你自己的環境變數（尤其是 `DASHSCOPE_API_KEY`）。
+
+### 最簡單部署步驟（5-10 分鐘）
+
+1. 推送最新代碼到 GitHub（已完成可跳過）
+2. Render：
+   - New + → Blueprint
+   - 選 `PetTimer` repo
+   - 建立後在 Environment 手動填：
+     - `DASHSCOPE_API_KEY`
+     - `JWT_SECRET`
+     - `FRONTEND_URL`（先可留空，部署前端後再回填）
+   - Deploy 後拿到後端網址（例如 `https://pettimer-backend.onrender.com`）
+3. Vercel：
+   - Add New Project → Import `PetTimer`
+   - Framework 選 Vite（通常自動）
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Environment Variables 加入：
+     - `VITE_API_BASE_URL=https://你的後端網址`
+   - Deploy，拿到前端網址
+4. 回 Render，把 `FRONTEND_URL` 更新為你的前端網址，再 Redeploy 一次
+
+完成後，前端網址就是你可以交給評審的 live demo link。
+
 ### 自定義 Hooks
 - `usePetState`：寵物狀態的自動管理
 - `usePomodoro`：番茄鐘計時器邏輯

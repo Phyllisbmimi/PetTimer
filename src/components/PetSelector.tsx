@@ -56,6 +56,27 @@ export const PetSelector: React.FC<PetSelectorProps> = ({ onSelectPet, existingP
       return;
     }
 
+    const starterItems = [
+      {
+        id: `starter-food-${Date.now()}`,
+        type: 'food' as const,
+        name: 'bone',
+        rarity: 'common' as const,
+      },
+      {
+        id: `starter-clothing-${Date.now()}`,
+        type: 'clothing' as const,
+        name: 'scarf',
+        rarity: 'common' as const,
+      },
+      {
+        id: `starter-toy-${Date.now()}`,
+        type: 'toy' as const,
+        name: 'ball',
+        rarity: 'common' as const,
+      },
+    ];
+
     const newPet: Pet = {
       id: Date.now().toString(),
       type: selectedType,
@@ -63,11 +84,11 @@ export const PetSelector: React.FC<PetSelectorProps> = ({ onSelectPet, existingP
       level: 1,
       experience: 0,
       hunger: 30,
-      happiness: 80,
+      happiness: 100,
       energy: 100,
       lastFed: new Date(),
       lastPetted: new Date(),
-      items: [],
+      items: starterItems,
     };
 
     onSelectPet(newPet);

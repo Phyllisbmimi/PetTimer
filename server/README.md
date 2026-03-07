@@ -27,6 +27,12 @@ cp .env.example .env
 
 2. Edit `.env` and configure:
 
+### Qwen AI Proxy (Required for AI features)
+
+```env
+DASHSCOPE_API_KEY=your-dashscope-api-key
+```
+
 ### Option 1: Gmail (Easiest for testing)
 
 ```env
@@ -127,6 +133,14 @@ Body: { email, code }
 ```
 POST /api/email/resend-code
 Body: { email, type: "email-verification" | "password-reset" }
+```
+
+### AI Proxy
+
+#### Qwen Chat Completions Proxy
+```
+POST /api/qwen
+Body: OpenAI-compatible chat completion payload
 ```
 
 ## 🔧 Integration with Frontend

@@ -8,10 +8,12 @@ const isTauri =
 const isHttpEnvironment =
   typeof window !== 'undefined' && /^https?:$/.test(window.location.protocol);
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
 // 在 Tauri 環境中直接調用 API，在 Web 環境中使用 proxy
 const DASHSCOPE_API_URL = isTauri || !isHttpEnvironment
   ? 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions'
-  : '/api/qwen';
+  : `${API_BASE_URL}/api/qwen`;
 
 // API Key - 請使用環境變數注入（不要硬編碼）
 const API_KEY = import.meta.env.VITE_DASHSCOPE_API_KEY || '';
