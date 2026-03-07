@@ -26,15 +26,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Tauri build outputs  
-src-tauri/target/
-*.dmg
-*.app
-*.exe
-*.msi
-*.deb
-*.AppImage
-
 # Private chat/export files
 ## GitHub Copilot Chat.md
 build.log
