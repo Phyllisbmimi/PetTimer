@@ -1,11 +1,23 @@
 import { create } from 'zustand';
 import { User, AuthState } from '../types';
 
-const isTauri =
-  typeof window !== 'undefined' &&
-  ('__TAURI__' in window || '__TAURI_INTERNALS__' in window);
+const hasTauriGlobal =
+  typeof window !== 'undefined' && typeof (window as any).__TAURI__ !== 'undefined';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const hasTauriInvoke =
+  typeof window !== 'undefined' && typeof (window as any).__TAURI_INTERNALS__?.invoke === 'function';
+
+const isTauri =
+  hasTauriGlobal || hasTauriInvoke;
+
+const envApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+const fallbackApiBaseUrl =
+  typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? 'http://localhost:3001'
+    : 'https://accessible-anet-hkbu-d244aea6.koyeb.app';
+
+const API_BASE_URL = envApiBaseUrl || fallbackApiBaseUrl;
 
 const AUTH_API_BASE = isTauri
   ? import.meta.env.VITE_AUTH_API_BASE_URL || (API_BASE_URL ? `${API_BASE_URL}/api/auth` : 'http://localhost:3001/api/auth')

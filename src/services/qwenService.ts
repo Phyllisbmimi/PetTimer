@@ -1,14 +1,26 @@
 // Qwen AI Service using DashScope API
 // 檢測是否在 Tauri 環境中運行
+const hasTauriGlobal =
+  typeof window !== 'undefined' && typeof (window as any).__TAURI__ !== 'undefined';
+
+const hasTauriInvoke =
+  typeof window !== 'undefined' && typeof (window as any).__TAURI_INTERNALS__?.invoke === 'function';
+
 const isTauri =
-  typeof window !== 'undefined' &&
-  ('__TAURI__' in window || '__TAURI_INTERNALS__' in window);
+  hasTauriGlobal || hasTauriInvoke;
 
 // 判斷是否是一般 http/https 網頁環境
 const isHttpEnvironment =
   typeof window !== 'undefined' && /^https?:$/.test(window.location.protocol);
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const envApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+const fallbackApiBaseUrl =
+  typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    ? 'http://localhost:3001'
+    : 'https://accessible-anet-hkbu-d244aea6.koyeb.app';
+
+const API_BASE_URL = envApiBaseUrl || fallbackApiBaseUrl;
 
 // 在 Tauri 環境中直接調用 API，在 Web 環境中使用 proxy
 const DASHSCOPE_API_URL = isTauri || !isHttpEnvironment
